@@ -14,7 +14,6 @@ jobs:
     - uses: actions/checkout@v1
       
     - name: Setting up conda
-      shell: bash
       run: |
         conda_install.sh
         export "CFLAGS=-I$CONDA_PREFIX/include $CFLAGS"
@@ -22,16 +21,17 @@ jobs:
         echo -e "\n\nCurrent compiler configuration:\nCXX=$CXX\nCC=$CC\nCFLAGS=$CFLAGS\nCXXFLAGS=$CXXFLAGS"
         echo -e "\nCurrent packages:"
         $CONDA list
+      shell: bash
       
     - name: Create Build Directory
+      run: mkdir build
       working-directory: ${{runner.workspace}}
       shell: bash
-      run: mkdir build
     
     - name: Configure CMake
-      working-directory: ${{runner.workspace}}/build
-      shell: bash
       run: |
         inv -e compile -n $NUMBER_OF_COMPILATION_JOBS
         python ci/check_compiled_files.py
         pytest -n auto -ra -vv .
+      working-directory: ${{runner.workspace}}/build
+      shell: bash
