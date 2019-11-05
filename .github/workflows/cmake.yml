@@ -33,3 +33,4 @@ jobs:
       run: inv -e compile -n $NUMBER_OF_COMPILATION_JOBS
            python ci/check_compiled_files.py
            pytest -n auto -ra -vv .
+
