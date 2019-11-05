@@ -4,7 +4,6 @@ on: [push]
 
 env:
   BUILD_TYPE: Release
-  PY_VER: 3.7
 
 jobs:
   build:
