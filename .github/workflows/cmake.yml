@@ -4,10 +4,10 @@ on: [push]
 
 env:
   BUILD_TYPE: Release
+  PY_VER: 3.7
 
 jobs:
   build:
-
 
     runs-on: ${{ matrix.os }}
     strategy:
@@ -16,7 +16,11 @@ jobs:
     
     steps:
     - uses: actions/checkout@v1
-
+      
+    - name: Setting up conda
+      shell: python
+      run: conda install
+      
     - name: Create Build Directory
       working-directory: ${{runner.workspace}}
       shell: bash
@@ -29,7 +33,7 @@ jobs:
     
     - name: Build
       working-directory: ${{runner.workspace}}/build
-      shell: bash
+      shell: python
       run: cmake --build . --config $BUILD_TYPE
 
     - name: Test
