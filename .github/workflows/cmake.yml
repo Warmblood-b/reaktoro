@@ -8,17 +8,19 @@ env:
 jobs:
   build:
 
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [windows-latest, ubuntu-latest, macOS-latest]
+    runs-on: ubuntu-latest
     
     steps:
     - uses: actions/checkout@v1
       
     - name: Setting up conda
-      shell: python
-      run: conda install
+      shell: bash
+      run: conda_install.sh
+           export "CFLAGS=-I$CONDA_PREFIX/include $CFLAGS"
+           export "CXXFLAGS=-I$CONDA_PREFIX/include $CXXFLAGS"
+           echo -e "\n\nCurrent compiler configuration:\nCXX=$CXX\nCC=$CC\nCFLAGS=$CFLAGS\nCXXFLAGS=$CXXFLAGS"
+           echo -e "\nCurrent packages:"
+           $CONDA list
       
     - name: Create Build Directory
       working-directory: ${{runner.workspace}}
@@ -28,14 +30,6 @@ jobs:
     - name: Configure CMake
       working-directory: ${{runner.workspace}}/build
       shell: bash
-      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE
-    
-    - name: Build
-      working-directory: ${{runner.workspace}}/build
-      shell: python
-      run: cmake --build . --config $BUILD_TYPE
-
-    - name: Test
-      working-directory: ${{runner.workspace}}/build
-      shell: bash
-      run: ctest -C $BUILD_TYPE
+      run: inv -e compile -n $NUMBER_OF_COMPILATION_JOBS
+           python ci/check_compiled_files.py
+           pytest -n auto -ra -vv .
