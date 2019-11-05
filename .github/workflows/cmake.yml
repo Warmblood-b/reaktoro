@@ -15,12 +15,13 @@ jobs:
       
     - name: Setting up conda
       shell: bash
-      run: conda_install.sh
-           export "CFLAGS=-I$CONDA_PREFIX/include $CFLAGS"
-           export "CXXFLAGS=-I$CONDA_PREFIX/include $CXXFLAGS"
-           echo -e "\n\nCurrent compiler configuration:\nCXX=$CXX\nCC=$CC\nCFLAGS=$CFLAGS\nCXXFLAGS=$CXXFLAGS"
-           echo -e "\nCurrent packages:"
-           $CONDA list
+      run: |
+        conda_install.sh
+        export "CFLAGS=-I$CONDA_PREFIX/include $CFLAGS"
+        export "CXXFLAGS=-I$CONDA_PREFIX/include $CXXFLAGS"
+        echo -e "\n\nCurrent compiler configuration:\nCXX=$CXX\nCC=$CC\nCFLAGS=$CFLAGS\nCXXFLAGS=$CXXFLAGS"
+        echo -e "\nCurrent packages:"
+        $CONDA list
       
     - name: Create Build Directory
       working-directory: ${{runner.workspace}}
@@ -30,6 +31,7 @@ jobs:
     - name: Configure CMake
       working-directory: ${{runner.workspace}}/build
       shell: bash
-      run: inv -e compile -n $NUMBER_OF_COMPILATION_JOBS
-           python ci/check_compiled_files.py
-           pytest -n auto -ra -vv .
+      run: |
+        inv -e compile -n $NUMBER_OF_COMPILATION_JOBS
+        python ci/check_compiled_files.py
+        pytest -n auto -ra -vv .
